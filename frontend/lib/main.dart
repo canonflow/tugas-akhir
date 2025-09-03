@@ -1,0 +1,47 @@
+import 'package:frontend/features/auth/pages/login_page.dart';
+import 'package:frontend/features/auth/pages/register_page.dart';
+import 'package:frontend/splash.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  print('All loaded env vars:');
+  // print(dotenv.env["SUPABASE_PROJECT_URL"]);
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return ShadcnApp(
+      title: 'Image Similarity',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorSchemes.lightDefaultColor,
+        radius: 0.3
+      ),
+      home: const SplashScreen(),
+      // routes: {
+      //   // Auth
+      //   LoginPage.route: (context) => LoginPage(),
+      //   'register': (context, role) => RegisterPage(role)
+      // },
+      onGenerateRoute: (settings) {
+        // ===== Auth =====
+        switch (settings.name) {
+          case LoginPage.route:
+            return MaterialPageRoute(builder: (context) => LoginPage());
+          case RegisterPage.route:
+            // Ambil role dari parameter
+            final role = settings.arguments as Map<String, String>;
+            return MaterialPageRoute(builder: (context) => RegisterPage(role: role['role']!));
+        }
+      },
+    );
+  }
+}
