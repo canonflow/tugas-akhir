@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (context) => LoginPage());
           case RegisterPage.route:
             // Ambil role dari parameter
-            final role = settings.arguments as Map<String, String>;
+            final role = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(builder: (context) => RegisterPage(role: role['role']!));
         }
       },

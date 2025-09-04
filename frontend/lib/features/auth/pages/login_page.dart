@@ -1,4 +1,6 @@
+import 'package:frontend/core/helper/page_move.dart';
 import 'package:frontend/features/auth/pages/register_page.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -78,12 +80,23 @@ class _LoginPageState extends State<LoginPage> {
                       child: PrimaryButton(
                         child: Text("Dosen"),
                         onPressed: () => {
-                          Navigator.popAndPushNamed(
-                            context,
-                            RegisterPage.route,
-                            arguments: {
-                              "role": "dosen"
-                            }
+                          // Navigator.popAndPushNamed(
+                          //   context,
+                          //   RegisterPage.route,
+                          //   arguments: {
+                          //     "role": "dosen"
+                          //   }
+                          // )
+                          // Navigator.pop(context),
+                          PageMove.PushNamed(
+                              context,
+                              RegisterPage.route,
+                              PageTransitionType.rightToLeft,
+                              Duration(milliseconds: 300),
+                              pop: true,
+                              arguments: {
+                                "role": "dosen"
+                              }
                           )
                         },
                       ),
@@ -93,12 +106,15 @@ class _LoginPageState extends State<LoginPage> {
                       child: PrimaryButton(
                         child: Text("Mahasiswa"),
                         onPressed: () => {
-                          Navigator.popAndPushNamed(
-                              context,
-                              RegisterPage.route,
-                              arguments: {
-                                "role": "mahasiswa"
-                              }
+                          PageMove.PushNamed(
+                            context,
+                            RegisterPage.route,
+                            PageTransitionType.rightToLeft,
+                            Duration(milliseconds: 300),
+                            arguments:{
+                              "role": "mahasiswa"
+                            },
+                            pop: true
                           )
                         },
                       ),
