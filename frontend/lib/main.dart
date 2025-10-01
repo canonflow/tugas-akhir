@@ -3,12 +3,22 @@ import 'package:frontend/features/auth/pages/register_page.dart';
 import 'package:frontend/splash.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   print('All loaded env vars:');
   // print(dotenv.env["SUPABASE_PROJECT_URL"]);
+
+
+  // Todo: Supabase Setup
+  await Supabase.initialize(
+    anonKey: dotenv.env["SUPABASE_ANON_KEY"]!,
+    url: dotenv.env["SUPABASE_PROJECT_URL"]!
+  );
+
+
   runApp(const MyApp());
 }
 

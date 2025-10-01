@@ -1,5 +1,6 @@
 import 'package:frontend/core/helper/page_move.dart';
 import 'package:frontend/features/auth/pages/register_page.dart';
+import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
@@ -16,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   // Text Controllers
   final _emailController =  TextEditingController();
   final _passwordController = TextEditingController();
+  final authService = AuthService();
   bool loginPressed = false;
   bool registerPressed = false;
 
@@ -28,31 +30,36 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text;
     final password = _passwordController.text;
 
-    await Future.delayed(Duration(seconds: 2));
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Alert title'),
-          content: const Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'),
-          actions: [
-            OutlineButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            PrimaryButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
+    // TODO: Attempt Login
+    try {
+      final response = await authService.loginWithEmailAndPassword(
+        email,
+        password,
+      );
+      print('Login successful: ${response}');
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: Text(
+                  "$e"
+              ),
+              actions: [
+                PrimaryButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
+      }
+    }
 
     setState(() {
       loginPressed = !loginPressed;
@@ -80,14 +87,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: PrimaryButton(
                         child: Text("Dosen"),
                         onPressed: () => {
-                          // Navigator.popAndPushNamed(
-                          //   context,
-                          //   RegisterPage.route,
-                          //   arguments: {
-                          //     "role": "dosen"
-                          //   }
-                          // )
-                          // Navigator.pop(context),
                           PageMove.PushNamed(
                               context,
                               RegisterPage.route,
@@ -152,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                 const Text('Email').semiBold().small(),
                 const SizedBox(height: 4),
                 TextField(
-                  placeholder: Text('Username'),
+                  placeholder: Text('Email'),
                   controller: _emailController,
                 ),
 

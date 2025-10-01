@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:frontend/auth_gate.dart';
 import 'package:frontend/features/auth/pages/login_page.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -30,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
       context,
       PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 1000),
-        pageBuilder: (_, __, ___) => const LoginPage(),
+        pageBuilder: (_, __, ___) => AuthGate(),
         transitionsBuilder: (_, animation, __, child) {
           final slideAnimation = Tween<Offset>(
             // begin: const Offset(0.2, 0.0), // dari kanan
