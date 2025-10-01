@@ -1,3 +1,4 @@
+import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 class RegisterPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController =  TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
-  final authService = AuthService();
+  final authService = getIt<AuthService>();
 
   bool registerPressed = false;
 

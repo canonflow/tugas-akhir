@@ -1,4 +1,5 @@
 import 'package:frontend/core/helper/page_move.dart';
+import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/pages/register_page.dart';
 import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:page_transition/page_transition.dart';
@@ -17,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   // Text Controllers
   final _emailController =  TextEditingController();
   final _passwordController = TextEditingController();
-  final authService = AuthService();
+  final authService = getIt<AuthService>();
   bool loginPressed = false;
   bool registerPressed = false;
 

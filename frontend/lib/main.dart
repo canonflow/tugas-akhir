@@ -1,3 +1,4 @@
+import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/pages/login_page.dart';
 import 'package:frontend/features/auth/pages/register_page.dart';
 import 'package:frontend/splash.dart';
@@ -18,6 +19,8 @@ void main() async {
     url: dotenv.env["SUPABASE_PROJECT_URL"]!
   );
 
+  // TODO: Setup Singleton Object
+  setupAllServices();
 
   runApp(const MyApp());
 }
