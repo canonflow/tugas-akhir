@@ -24,7 +24,7 @@ Widget CustomAppBar(BuildContext context, String title, bool hasPrevious) {
       )
     ],
     trailing: [
-      OutlineButton(
+      DestructiveButton(
         size: ButtonSize.small,
         density: ButtonDensity.icon,
         onPressed: () async {
