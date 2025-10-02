@@ -1,4 +1,5 @@
 import 'package:frontend/core/helper/page_move.dart';
+import 'package:frontend/core/utils/date.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
@@ -89,13 +90,6 @@ class _DosenPageState extends State<DosenPage> {
                         size: ButtonSize.normal,
                         onPressed: () {
                           Navigator.pushNamed(context, CreateTopicPage.route);
-                          // PageMove.PushNamed(
-                          //     context,
-                          //     CreateTopicPage.route,
-                          //     PageTransitionType.rightToLeft,
-                          //     Duration(milliseconds: 300),
-                          //     pop: true,
-                          // );
                         },
                         trailing: const Icon(Icons.add),
                         child: const Text('Add'),
@@ -148,7 +142,7 @@ class _DosenPageState extends State<DosenPage> {
                           ).withPadding(vertical: 40),
                         )
                       : IntrinsicHeight(
-                          child: Row(
+                          child: Column(
                             children: topics
                                 .map((topic) => [
                                   Expanded(
@@ -162,9 +156,10 @@ class _DosenPageState extends State<DosenPage> {
                                             : Container(color: Colors.gray[300]),
                                       ),
                                       title: Text(topic.name),
+                                      subtitle: Text(dateFormatter(topic.createdAt)),
                                     ),
                                   ),
-                                  const Gap(8),
+                                  const Gap(20),
                                 ])
                                 .expand((widget) => widget)
                                 .toList()

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/services/topic_service.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
@@ -22,6 +23,13 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   final topicService = getIt<TopicService>();
   bool isCreating = false;
   File? image = null;
+
+  String? selectedImageKey;
+
+  final Map<String, String> availableImages = {
+    "Test": "public/images/test.jpg",
+    "Test 2": "public/images/test2.jpg"
+  };
 
   // TODO: Pick the image
   Future<void> pickImage() async {
@@ -87,60 +95,144 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                 placeholder: Text('Enter topic name'),
                 controller: _nameController,
               ),
-              const Gap(16),
+              const Gap(24),
 
               // ===== Image Section =====
               const Text('Topic Image').semiBold().small(),
               const SizedBox(height: 8),
 
-              // Show image preview if image is selected
-              if (image != null) ...[
+              // ===== Image Preview =====
+              if (selectedImageKey != null) ...[
                 Container(
                   width: double.infinity,
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.gray[300]!),
+                    border: Border.all(color: Colors.gray[300]),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Stack(
-                      children: [
-                        Image.file(
-                          image!,
-                          width: double.infinity,
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                        Positioned(
-                          top: 8,
-                          right: 8,
-                          child: OutlineButton(
-                            size: ButtonSize.small,
-                            density: ButtonDensity.icon,
-                            onPressed: removeImage,
-                            child: const Icon(Icons.close),
+                    child: Image.asset(
+                      availableImages[selectedImageKey]!,
+                      width: double.infinity,
+                      height: 200,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        print(error);
+                        return Container(
+                          color: Colors.gray[300],
+                          child: const Center(
+                            child: Icon(Icons.broken_image, size: 46),
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
-                ),
-                const Gap(8),
+                )
               ],
 
-              // Image picker button
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlineButton(
-                      leading: const Icon(Icons.image),
-                      onPressed: pickImage,
-                      child: Text(image == null ? 'Select Image' : 'Change Image'),
-                    ),
-                  ),
-                ],
+              const Gap(12),
+
+              // ===== Image Dropdown =====
+              Select<String>(
+                placeholder: const Text("Select an image"),
+                value: selectedImageKey,
+                onChanged: (value) {
+                  setState(() {
+                    selectedImageKey = value;
+                  });
+                },
+                itemBuilder: (context, item) {
+                  return Text(item);
+                },
+                popupConstraints: const BoxConstraints(
+                  maxHeight: 300,
+                ),
+                popup: SelectPopup.builder(
+                  builder: (context, query) {
+                    return SelectItemList(
+                      children: [
+                        for (final entry in availableImages.entries)
+                          SelectItemButton(
+                            value: entry.key,
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: Image.asset(
+                                    entry.value,
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        width: 40,
+                                        height: 40,
+                                        color: Colors.gray[300],
+                                        child: const Icon(Icons.broken_image, size: 20),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                const Gap(12),
+                                Text(entry.key),
+                              ],
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ),
+
+              // Show image preview if image is selected
+              // if (image != null) ...[
+              //   Container(
+              //     width: double.infinity,
+              //     height: 200,
+              //     decoration: BoxDecoration(
+              //       borderRadius: BorderRadius.circular(8),
+              //       border: Border.all(color: Colors.gray[300]!),
+              //     ),
+              //     child: ClipRRect(
+              //       borderRadius: BorderRadius.circular(8),
+              //       child: Stack(
+              //         children: [
+              //           Image.file(
+              //             image!,
+              //             width: double.infinity,
+              //             height: 200,
+              //             fit: BoxFit.cover,
+              //           ),
+              //           Positioned(
+              //             top: 8,
+              //             right: 8,
+              //             child: OutlineButton(
+              //               size: ButtonSize.small,
+              //               density: ButtonDensity.icon,
+              //               onPressed: removeImage,
+              //               child: const Icon(Icons.close),
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              //   const Gap(8),
+              // ],
+
+              // Image picker button
+              // Row(
+              //   children: [
+              //     Expanded(
+              //       child: OutlineButton(
+              //         leading: const Icon(Icons.image),
+              //         onPressed: pickImage,
+              //         child: Text(image == null ? 'Select Image' : 'Change Image'),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const Gap(16),
 
               Row(
@@ -169,7 +261,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           return;
                         }
 
-                        if (image == null) {
+                        if (selectedImageKey == null) {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -192,9 +284,56 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
 
                         // TODO: Call Topic Service
                         try {
-                          final response = await topicService.create(_nameController.text, image!);
-                          print(response);
-                          CustomSimpleDialog(context, "Success", "New topic inserted successfully");
+                          // final response = await topicService.create(_nameController.text, image!);
+                          // print(response);
+                          // CustomSimpleDialog(context, "Success", "New topic inserted successfully");
+
+                          // TODO: 01. Get the image path from the MAP
+                          final imagePath = availableImages[selectedImageKey]!;
+
+                          // TODO: 02. Extract the file extension from the path
+                          final extension = imagePath.split(".").last;
+
+                          // TODO: 03. Convert asset to File
+                          final byteData = await rootBundle.load(imagePath);
+                          final file = File('${Directory.systemTemp.path}/${DateTime.now().millisecondsSinceEpoch}.$extension');
+                          await file.writeAsBytes(
+                            byteData.buffer.asUint8List(
+                              byteData.offsetInBytes,
+                              byteData.lengthInBytes
+                            )
+                          );
+
+                          // TODO: 04. Create a new topic
+                          final response = await topicService.create(
+                            _nameController.text,
+                            file
+                          );
+
+                          // TODO: 05. Delete temporary file
+                          if (await file.exists()) {
+                            await file.delete();
+                          }
+
+                          if (mounted) {
+                            await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Success'),
+                                content: const Text('New topic created successfully!'),
+                                actions: [
+                                  PrimaryButton(
+                                    onPressed: () {
+                                      Navigator.pop(context); // Close dialog
+                                      Navigator.pop(context); // Go back to previous page
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
                         } catch (e) {
                           CustomSimpleDialog(context, "Error", e.toString());
                         } finally {
