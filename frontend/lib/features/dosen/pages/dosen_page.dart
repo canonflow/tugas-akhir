@@ -1,8 +1,11 @@
+import 'package:frontend/core/helper/page_move.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
+import 'package:frontend/features/dosen/pages/topics/create_page.dart';
 import 'package:frontend/features/dosen/services/topic_service.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:frontend/shared/app_bar.dart';
 
@@ -52,6 +55,7 @@ class _DosenPageState extends State<DosenPage> {
         headers: [
           CustomAppBar(context, "Home Page", false)
         ],
+        // floatingFooter: true,
         child: RefreshTrigger(
           key: _refreshTriggerKey,
           onRefresh: () async {
@@ -83,7 +87,16 @@ class _DosenPageState extends State<DosenPage> {
                     children: [
                       PrimaryButton(
                         size: ButtonSize.normal,
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, CreateTopicPage.route);
+                          // PageMove.PushNamed(
+                          //     context,
+                          //     CreateTopicPage.route,
+                          //     PageTransitionType.rightToLeft,
+                          //     Duration(milliseconds: 300),
+                          //     pop: true,
+                          // );
+                        },
                         trailing: const Icon(Icons.add),
                         child: const Text('Add'),
                       ),

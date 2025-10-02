@@ -23,22 +23,27 @@ class _LoginPageState extends State<LoginPage> {
   bool registerPressed = false;
 
   Future<void> login() async {
+    print(loginPressed);
     if (loginPressed) return;
 
     setState(() {
-      loginPressed = !loginPressed;
+      loginPressed = true;
     });
     final email = _emailController.text;
     final password = _passwordController.text;
+    print(email);
+    print(password);
 
     // TODO: Attempt Login
     try {
+      print("ON TRY SCOPRE");
       final response = await authService.loginWithEmailAndPassword(
         email,
         password,
       );
       print('Login successful: ${response}');
     } catch (e) {
+      print("ERROR LOGIN");
       if (mounted) {
         showDialog(
           context: context,
@@ -63,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() {
-      loginPressed = !loginPressed;
+      loginPressed = false;
     });
   }
 

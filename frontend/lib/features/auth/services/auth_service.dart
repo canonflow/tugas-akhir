@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:frontend/features/auth/models/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -6,10 +8,21 @@ class AuthService {
 
   // TODO: Login with email and password
   Future<AuthResponse> loginWithEmailAndPassword(String email, String password) async {
-    return await _supabase.auth.signInWithPassword(
-      email: email,
-      password: password
-    );
+    //await _supabase.auth.signOut(); // just in case
+    print("AUTH SERVICE: LOGIN");
+    try {
+      return await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw TimeoutException("Login request timeout");
+        }
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // TODO: Register with email and password

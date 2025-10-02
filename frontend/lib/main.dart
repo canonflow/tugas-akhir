@@ -1,6 +1,7 @@
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/pages/login_page.dart';
 import 'package:frontend/features/auth/pages/register_page.dart';
+import 'package:frontend/features/dosen/pages/topics/create_page.dart';
 import 'package:frontend/splash.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,13 +11,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   print('All loaded env vars:');
-  // print(dotenv.env["SUPABASE_PROJECT_URL"]);
+  print(dotenv.env["SUPABASE_PROJECT_URL"]);
+  print(dotenv.env["SUPABASE_ANON_KEY"]);
 
 
   // Todo: Supabase Setup
   await Supabase.initialize(
     anonKey: dotenv.env["SUPABASE_ANON_KEY"]!,
-    url: dotenv.env["SUPABASE_PROJECT_URL"]!
+    url: dotenv.env["SUPABASE_PROJECT_URL"]!,
+    debug: true,
+    // authOptions: const FlutterAuthClientOptions(
+    //   authFlowType: AuthFlowType.pkce,
+    // ),
   );
 
   // TODO: Setup Singleton Object
@@ -53,6 +59,8 @@ class MyApp extends StatelessWidget {
             // Ambil role dari parameter
             final role = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(builder: (context) => RegisterPage(role: role['role']!));
+          case CreateTopicPage.route:
+            return MaterialPageRoute(builder: (context) => CreateTopicPage());
         }
       },
     );
