@@ -147,39 +147,29 @@ class _DosenPageState extends State<DosenPage> {
                             ],
                           ).withPadding(vertical: 40),
                         )
-                      : ListView.builder(
-                          shrinkWrap: true, // Important: prevents infinite height error
-                          physics: NeverScrollableScrollPhysics(), // Disable inner scrolling
-                          itemCount: topics.length,
-                          itemBuilder: (context, index) {
-                            final topic = topics[index];
-                            return CardImage(
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text('Card Image'),
-                                      content: const Text('You clicked on a card image.'),
-                                      actions: [
-                                        PrimaryButton(
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                          child: const Text('Close'),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              image: Image.network(
-                                'https://picsum.photos/200/300',
-                              ),
-                              title: Text(topic.name),
-                              subtitle: const Text('Lorem ipsum dolor sit amet'),
-                            );
-                          },
+                      : IntrinsicHeight(
+                          child: Row(
+                            children: topics
+                                .map((topic) => [
+                                  Expanded(
+                                    child: CardImage(
+                                      onPressed: () { /* ... */ },
+                                      image: SizedBox(
+                                        width: double.infinity,
+                                        height: 200,
+                                        child: topic.image != null
+                                            ? Image.network(topic.image!, fit: BoxFit.cover)
+                                            : Container(color: Colors.gray[300]),
+                                      ),
+                                      title: Text(topic.name),
+                                    ),
+                                  ),
+                                  const Gap(8),
+                                ])
+                                .expand((widget) => widget)
+                                .toList()
+                              ..removeLast(), // Remove last gap
+                          ),
                         )
                 ],
               ).withPadding(vertical: 10, horizontal: 16),

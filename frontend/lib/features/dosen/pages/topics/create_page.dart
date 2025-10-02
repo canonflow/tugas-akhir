@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:frontend/core/utils/injections.dart';
+import 'package:frontend/features/dosen/services/topic_service.dart';
+import 'package:frontend/shared/custom_simple_dialog.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:frontend/shared/app_bar.dart';
@@ -15,8 +18,10 @@ class CreateTopicPage extends StatefulWidget {
 
 class _CreateTopicPageState extends State<CreateTopicPage> {
   final _nameController = TextEditingController();
-  File? image = null;
   final ImagePicker _picker = ImagePicker();
+  final topicService = getIt<TopicService>();
+  bool isCreating = false;
+  File? image = null;
 
   // TODO: Pick the image
   Future<void> pickImage() async {
@@ -143,7 +148,9 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                   Expanded(
                     child: PrimaryButton(
                       child: const Text('Create'),
-                      onPressed: () {
+                      onPressed: () async {
+                        if (isCreating) return;
+
                         // TODO: Implement create logic
                         if (_nameController.text.isEmpty) {
                           showDialog(
@@ -179,9 +186,22 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           return;
                         }
 
-                        // Create topic
-                        print('Name: ${_nameController.text}');
-                        print('Image: ${image!.path}');
+                        setState(() {
+                          isCreating = true;
+                        });
+
+                        // TODO: Call Topic Service
+                        try {
+                          final response = await topicService.create(_nameController.text, image!);
+                          print(response);
+                          CustomSimpleDialog(context, "Success", "New topic inserted successfully");
+                        } catch (e) {
+                          CustomSimpleDialog(context, "Error", e.toString());
+                        } finally {
+                          setState(() {
+                            isCreating = false;
+                          });
+                        }
                       },
                     ),
                   ),
