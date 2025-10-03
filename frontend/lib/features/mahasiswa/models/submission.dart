@@ -31,12 +31,13 @@ class SubmissionModel {
       id: json['id'],
       topic: TopicModel.fromJson(json['topic']),
       user: UserModel.fromJson(json['user']),
-      predictedScore: json['predicted_score'],
-      finalScore: json['final_score'],
-      image: json['image'], 
-      status: json['status'],
+      predictedScore: (json['predicted_score'] ?? 0.0).toDouble(),
+      finalScore: (json['final_score'] ?? 0.0).toDouble(),
+      image: json['image'],
+      status: json['status'] ?? 'pending',
+      feedback: json['feedback'],
       createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at'])
+      updatedAt: DateTime.parse(json['updated_at']),
     );
   }
 }
