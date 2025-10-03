@@ -34,6 +34,11 @@ class AuthService {
         "role": role,
         "name": name
       },
+    ).timeout(
+      Duration(seconds: 10),
+      onTimeout: () {
+        throw TimeoutException("Register request timeout");
+      }
     );
   }
 

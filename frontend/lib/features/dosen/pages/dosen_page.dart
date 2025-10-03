@@ -4,6 +4,7 @@ import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/topics/create_page.dart';
+import 'package:frontend/features/dosen/pages/topics/detail_page.dart';
 import 'package:frontend/features/dosen/services/topic_service.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
 import 'package:page_transition/page_transition.dart';
@@ -147,7 +148,9 @@ class _DosenPageState extends State<DosenPage> {
                                 .map((topic) => [
                                   Expanded(
                                     child: CardImage(
-                                      onPressed: () { /* ... */ },
+                                      onPressed: () {
+                                        Navigator.pushNamed(context, DetailTopicPage.route, arguments: topic);
+                                      },
                                       image: SizedBox(
                                         width: double.infinity,
                                         height: 200,

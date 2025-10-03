@@ -1,7 +1,9 @@
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/pages/login_page.dart';
 import 'package:frontend/features/auth/pages/register_page.dart';
+import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/topics/create_page.dart';
+import 'package:frontend/features/dosen/pages/topics/detail_page.dart';
 import 'package:frontend/splash.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -61,6 +63,9 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (context) => RegisterPage(role: role['role']!));
           case CreateTopicPage.route:
             return MaterialPageRoute(builder: (context) => CreateTopicPage());
+          case DetailTopicPage.route:
+            final topic = settings.arguments as TopicModel;
+            return MaterialPageRoute(builder: (context) => DetailTopicPage(topic: topic));
         }
       },
     );
