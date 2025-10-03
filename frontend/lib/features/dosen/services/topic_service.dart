@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
+import 'package:frontend/features/mahasiswa/models/topic_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class TopicService {
@@ -60,6 +61,80 @@ class TopicService {
       return TopicModel.fromJson(data);
     } catch (e) {
       print("Error creating topic: $e");
+      rethrow;
+    }
+  }
+
+  // TODO: Get All topics user (student) has not joined
+  Future<List<TopicModel>> getAvailableTopic(String userId) async {
+    try {
+      // TODO: 01. Get all topic IDs user has joined
+      final joinedTopicsResponse = await _supabase
+          .from("topic_users")
+          .select('topic_id')
+          .eq("user_id", userId);
+
+      final joinedTopicIds = (joinedTopicsResponse as List)
+        .map((item) => item['topic_id'] as int)
+        .toList();
+
+      // TODO: 02. Get all topics that user has not joined
+      var query = _supabase.from("topics")
+        .select();
+
+      if (joinedTopicIds.isNotEmpty) {
+        query = query.not("id", "in", joinedTopicIds);
+      }
+
+      final data = await query.order("created_at", ascending: false);
+
+      return (data as List).map((json) => TopicModel.fromJson(json)).toList();
+    } catch (e) {
+      print("Error getting available topics: $e");
+      rethrow;
+    }
+  }
+
+  // TODO: Get All topics user has joined
+  Future<List<TopicModel>> getJoinedTopic(String userId) async {
+    try {
+      final data = await _supabase
+          .from('topics')
+          .select("*")
+          .inFilter(
+            'id',
+            await _supabase
+              .from('topic_users')
+              .select('topic_id')
+              .eq('user_id', userId)
+              .then((response) => (response as List).map((item) => item['topic_id']).toList())
+          )
+          .order('created_at', ascending: false);
+
+      return (data as List).map((json) => TopicModel.fromJson(json)).toList();
+    } catch (e) {
+      print("Error getting joined topic: $e");
+      rethrow;
+    }
+  }
+
+  // TODO: Join the topic
+  Future<TopicUserModel> joinTopic(TopicModel topic) async {
+    try {
+      final userId = authService.getCurrentUser().id!;
+
+      final data = await _supabase
+        .from("topic_users")
+        .insert({
+          'topic_id': topic.id,
+          'user_id': userId
+        })
+        .select()
+        .single();
+
+      return TopicUserModel.fromJson(data);
+    } catch (e) {
+      print("Error Join Topic: $e");
       rethrow;
     }
   }
