@@ -4,6 +4,7 @@ import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/services/topic_service.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/browse_page.dart';
+import 'package:frontend/features/mahasiswa/pages/topics/detail_page.dart';
 import 'package:frontend/shared/app_bar.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -148,7 +149,9 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
                             .map((topic) => [
                           Expanded(
                             child: CardImage(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.pushNamed(context, StudentDetailTopicPage.route, arguments: topic);
+                              },
                               image: SizedBox(
                                 width: double.infinity,
                                 height: 200,

@@ -5,6 +5,7 @@ import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/topics/create_page.dart';
 import 'package:frontend/features/dosen/pages/topics/detail_page.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/browse_page.dart';
+import 'package:frontend/features/mahasiswa/pages/topics/detail_page.dart';
 import 'package:frontend/splash.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -71,6 +72,10 @@ class MyApp extends StatelessWidget {
           // ===== MAHASISWA =====
           case BrowseTopicPage.route:
             return MaterialPageRoute(builder: (context) => BrowseTopicPage());
+        
+          case StudentDetailTopicPage.route:
+            final topic = settings.arguments as TopicModel;
+            return MaterialPageRoute(builder: (context) => StudentDetailTopicPage(topic: topic));
         }
       },
     );
