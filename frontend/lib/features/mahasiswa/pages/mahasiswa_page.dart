@@ -18,6 +18,7 @@ class MahasiswaPage extends StatefulWidget {
 class _MahasiswaPageState extends State<MahasiswaPage> {
   final authService = getIt<AuthService>();
   final topicService = getIt<TopicService>();
+  final GlobalKey<RefreshTriggerState> _refreshTriggerKey = GlobalKey<RefreshTriggerState>();
   List<TopicModel> joinedTopics = [];
   bool isLoading = true;
 
@@ -54,110 +55,121 @@ class _MahasiswaPageState extends State<MahasiswaPage> {
         headers: [
           CustomAppBar(context, "Home Page", false)
         ],
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              children: [
-                // ===== WELCOME MESSAGE =====
-                Row(
-                  children: [
-                    Expanded(
-                        child: Alert(
-                          title: Text("Welcome message"),
-                          content: Text("Selamat datang, ${user.name ?? 'User'}"), // Fixed string concatenation
-                          leading: Icon(Icons.info_outline),
-                        )
+        child: RefreshTrigger(
+          key: _refreshTriggerKey,
+          onRefresh: () async {
+            setState(() {
+              isLoading = true;
+            });
+            loadJoinedTopics();
+          },
+          child: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                children: [
+                  // ===== WELCOME MESSAGE =====
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Alert(
+                            title: Text("Welcome message"),
+                            content: Text("Selamat datang, ${user.name ?? 'User'}"), // Fixed string concatenation
+                            leading: Icon(Icons.info_outline),
+                          )
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 24),
+
+                  // ===== BUTTONS =====
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      PrimaryButton(
+                        size: ButtonSize.normal,
+                        onPressed: () {
+                          Navigator.pushNamed(context, BrowseTopicPage.route);
+                        },
+                        leading: const Icon(Icons.find_in_page_rounded),
+                        child: const Text('Browse Topic'),
+                      ),
+                      Spacer(),
+                      OutlineButton(
+                        size: ButtonSize.small,
+                        density: ButtonDensity.icon,
+                        onPressed: () {
+                          _refreshTriggerKey.currentState!.refresh();
+                        },
+                        child: const Icon(Icons.refresh_rounded),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 30),
+
+                  // ===== JOINED TOPIC(S) =====
+                  if (isLoading)
+                    Column(
+                      children: List.generate(3, (index) {
+                        return Row(
+                          children: [Expanded(
+                            child: Basic(
+                              title: const Text('Loading...').asSkeleton(),
+                              content: const Text('Please wait...').asSkeleton(),
+                              leading: const Avatar(initials: '').asSkeleton(),
+                              trailing: const Text('Status').asSkeleton(),
+                            ).withPadding(bottom: 12),
+                          )],
+                        );
+                      }),
                     )
-                  ],
-                ),
-                SizedBox(height: 24),
-
-                // ===== BUTTONS =====
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    PrimaryButton(
-                      size: ButtonSize.normal,
-                      onPressed: () {
-                        Navigator.pushNamed(context, BrowseTopicPage.route);
-                      },
-                      leading: const Icon(Icons.find_in_page_rounded),
-                      child: const Text('Browse Topic'),
-                    ),
-                    Spacer(),
-                    OutlineButton(
-                      size: ButtonSize.small,
-                      density: ButtonDensity.icon,
-                      onPressed: () {},
-                      child: const Icon(Icons.refresh_rounded),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 30),
-
-                // ===== JOINED TOPIC(S) =====
-                if (isLoading)
-                  Column(
-                    children: List.generate(3, (index) {
-                      return Row(
-                        children: [Expanded(
-                          child: Basic(
-                            title: const Text('Loading...').asSkeleton(),
-                            content: const Text('Please wait...').asSkeleton(),
-                            leading: const Avatar(initials: '').asSkeleton(),
-                            trailing: const Text('Status').asSkeleton(),
-                          ).withPadding(bottom: 12),
-                        )],
-                      );
-                    }),
-                  )
-                else if (joinedTopics.isEmpty)
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.inbox_outlined, size: 64, color: Colors.gray[400]),
-                        const Gap(16),
-                        const Text("No topic(s) yet").h4,
-                        const Gap(8),
-                        Text(
-                          "You haven't joined any topics",
-                          textAlign: TextAlign.center,
-                        )
-                            .muted()
-                            .small(),
-                      ],
-                    ).withPadding(vertical: 40),
-                  )
-                else
-                  IntrinsicHeight(
-                    child: Column(
-                      children: joinedTopics
-                          .map((topic) => [
-                        Expanded(
-                          child: CardImage(
-                            onPressed: () {},
-                            image: SizedBox(
-                              width: double.infinity,
-                              height: 200,
-                              child: topic.image != null
-                                  ? Image.network(topic.image!, fit: BoxFit.cover)
-                                  : Container(color: Colors.gray[300]),
+                  else if (joinedTopics.isEmpty)
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.inbox_outlined, size: 64, color: Colors.gray[400]),
+                          const Gap(16),
+                          const Text("No topic(s) yet").h4,
+                          const Gap(8),
+                          Text(
+                            "You haven't joined any topics",
+                            textAlign: TextAlign.center,
+                          )
+                              .muted()
+                              .small(),
+                        ],
+                      ).withPadding(vertical: 40),
+                    )
+                  else
+                    IntrinsicHeight(
+                      child: Column(
+                        children: joinedTopics
+                            .map((topic) => [
+                          Expanded(
+                            child: CardImage(
+                              onPressed: () {},
+                              image: SizedBox(
+                                width: double.infinity,
+                                height: 200,
+                                child: topic.image != null
+                                    ? Image.network(topic.image!, fit: BoxFit.cover)
+                                    : Container(color: Colors.gray[300]),
+                              ),
+                              title: Text(topic.name),
+                              subtitle: Text(dateFormatter(topic.createdAt)),
                             ),
-                            title: Text(topic.name),
-                            subtitle: Text(dateFormatter(topic.createdAt)),
                           ),
-                        ),
-                        const Gap(20),
-                      ])
-                          .expand((widget) => widget)
-                          .toList()
-                        ..removeLast(), // Remove last gap
-                    ),
-                  )
-              ],
-            ).withPadding(vertical: 10, horizontal: 16),
+                          const Gap(20),
+                        ])
+                            .expand((widget) => widget)
+                            .toList()
+                          ..removeLast(), // Remove last gap
+                      ),
+                    )
+                ],
+              ).withPadding(vertical: 10, horizontal: 16),
+            ),
           ),
         )
     );
