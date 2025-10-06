@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
+import 'package:frontend/features/dosen/pages/topics/enrolled_student.dart';
 import 'package:frontend/features/dosen/pages/topics/submissions/grade_page.dart';
 import 'package:frontend/features/mahasiswa/models/submission.dart';
 import 'package:frontend/features/mahasiswa/services/submission_service.dart';
@@ -48,6 +49,13 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
         isLoading = false;
       });
     }
+  }
+
+  Future<void> showEnrolledStudents(TopicModel topic) async {
+    showDialog(
+      context: context,
+      builder: (context) => EnrolledStudentDialog(topic: topic)
+    );
   }
 
   Color getStatusColor(String status) {
@@ -150,29 +158,6 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
     }
   }
 
-  Future<void> openGradeDialog(String type, SubmissionModel submission) async {
-    try {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: type == "update" ? Text("Update the grade") : Text("Create the grade"),
-            content: Column(
-              children: [
-                Text("SD")
-              ],
-            ),
-          );
-        }
-      );
-    } catch (e) {
-      print(e);
-      if (mounted) {
-        CustomSimpleDialog(context, "Error", e.toString());
-      }
-    }
-  }
-
   @override void initState() {
     // TODO: implement initState
     super.initState();
@@ -217,6 +202,21 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                 ),
 
                 const Gap(26),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: SecondaryButton(
+                          onPressed: () async {
+                            showEnrolledStudents(widget.topic);
+                          },
+                          child: Text("Students")
+                      ),
+                    )
+                  ],
+                ),
+
+                const Gap(20),
 
                 // ===== SUBMISSIONS ======
                 Text(
@@ -399,7 +399,7 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                                         );
                                       }
                                     },
-                                    child: submission.finalScore != null ? Text("Grade the submission") : Text("Update the Grade"),
+                                    child: submission.finalScore == null ? Text("Grade the submission") : Text("Update the Grade"),
                                   ).withMargin(vertical: 4)
                                 ],
                               ),

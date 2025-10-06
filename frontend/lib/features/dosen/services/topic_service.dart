@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:frontend/core/utils/injections.dart';
+import 'package:frontend/features/auth/models/user.dart';
 import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/mahasiswa/models/topic_user.dart';
@@ -135,6 +136,33 @@ class TopicService {
       return TopicUserModel.fromJson(data);
     } catch (e) {
       print("Error Join Topic: $e");
+      rethrow;
+    }
+  }
+
+  // TODO: Get all users by topic
+  Future<List<UserModel>> getTopicUsers(TopicModel topic) async {
+    try {
+      final response = await _supabase
+        .from('topic_users')
+        .select('''
+          user_id,
+          users!inner (
+            id,
+            email,
+            name,
+            role,
+            created_at,
+            updated_at
+          )
+        ''')
+        .eq('topic_id', topic.id);
+
+      return (response as List).map((json) {
+        return UserModel.fromJson(json['users']);
+      }).toList();
+    } catch (e) {
+      print("Error fetching topic users: $e");
       rethrow;
     }
   }
