@@ -106,7 +106,7 @@ class _StudentFinalSubmissionPageState extends State<StudentFinalSubmissionPage>
                   ? widget.submission.feedback
                   : "No Feedback",
                 expandableHeight: true,
-                initialHeight: 300,
+                initialHeight: 120,
                 enabled: false,
               ),
 
@@ -136,7 +136,7 @@ class _StudentFinalSubmissionPageState extends State<StudentFinalSubmissionPage>
                 ],
               ),
             ],
-          ),
+          ).withPadding(vertical: 10, horizontal: 16),
         ),
       )
     );

@@ -4,6 +4,7 @@ import 'package:frontend/features/auth/pages/register_page.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/topics/create_page.dart';
 import 'package:frontend/features/dosen/pages/topics/detail_page.dart';
+import 'package:frontend/features/dosen/pages/topics/submissions/detail_page.dart';
 import 'package:frontend/features/mahasiswa/models/submission.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/browse_page.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/detail_page.dart';
@@ -72,6 +73,9 @@ class MyApp extends StatelessWidget {
           case DetailTopicPage.route:
             final topic = settings.arguments as TopicModel;
             return MaterialPageRoute(builder: (context) => DetailTopicPage(topic: topic));
+          case LectureSubmissionDetailPage.route:
+            final submission = settings.arguments as SubmissionModel;
+            return MaterialPageRoute(builder: (context) => LectureSubmissionDetailPage(submission: submission));
 
           // ===== MAHASISWA =====
           case BrowseTopicPage.route:

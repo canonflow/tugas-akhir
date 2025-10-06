@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/mahasiswa/models/submission.dart';
+import 'package:frontend/features/mahasiswa/pages/topics/submissions/result_page.dart';
 import 'package:frontend/features/mahasiswa/services/submission_service.dart';
 import 'package:frontend/shared/app_bar.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
@@ -396,6 +397,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                           Expanded(
                             child: CardButton(
                               onPressed: () {
+                                Navigator.pushNamed(context, StudentFinalSubmissionPage.route, arguments: item);
                                 print(item);
                               },
                               child: Padding(
@@ -421,7 +423,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              const Text("Predicted Score"),
+                                              const Text("Status"),
                                               Container(
                                                 padding: const EdgeInsets.symmetric(
                                                     horizontal: 8,
@@ -444,7 +446,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                                           const Gap(8),
 
                                           // Scores
-                                          Text('Score: ${item.predictedScore.toStringAsFixed(1)}')
+                                          Text('Predicted Score: ${item.predictedScore.toStringAsFixed(1)}')
                                               .small(),
                                           if (item.finalScore != null)
                                             Text('Final Score: ${item.finalScore!.toStringAsFixed(1)}')
