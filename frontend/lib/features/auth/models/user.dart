@@ -21,8 +21,8 @@ class UserModel {
       email: json['email'],
       role: json['role'],
       name: json['name'],
-      createdAt: json['created_at'] ? DateTime.parse(json['created_at']) : null,
-      updatedAt: json['updated_at'] ? DateTime.parse(json['updated_at']) : null,
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : null,
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : null,
     );
   }
 }

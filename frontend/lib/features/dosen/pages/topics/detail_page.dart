@@ -174,7 +174,7 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                                   ),
                                   const Gap(8),
                                   Text('Predicted Score: ${submission.predictedScore.toStringAsFixed(1)}').small(),
-                                  Text('Final Score: ${submission.finalScore.toStringAsFixed(1)}').small().semiBold(),
+                                  Text('Final Score: ${submission.finalScore!.toStringAsFixed(1)}').small().semiBold(),
                                   if (submission.feedback != null) ...[
                                     const Divider().withPadding(vertical: 12),
                                     const Text('Feedback:').small().semiBold(),
@@ -203,7 +203,7 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Predicted: ${submission.predictedScore.toStringAsFixed(1)}').small().muted(),
-                            Text('Final: ${submission.finalScore.toStringAsFixed(1)}').small().semiBold(),
+                            Text('Final: ${submission.finalScore?.toStringAsFixed(1)}').small().semiBold(),
                           ],
                         ),
                         trailing: Container(

@@ -34,6 +34,7 @@ class SubmissionService {
           .eq("topic_id", topic.id)
           .order('created_at', ascending: false);
 
+
       return (response as List)
           .map((json) {
             final Map<String, dynamic> restructured = {
@@ -70,30 +71,32 @@ class SubmissionService {
             user_id,
             name,
             image,
-            created_at
+            created_at,
+            updated_at
           ),
           users!inner (
             id,
             email,
             name,
-            role
+            role,
+            created_at,
+            updated_at
           )
         ''')
         .eq("user_id", userId)
         .eq("topic_id", topicId)
         .order('created_at', ascending: false);
 
+      // print("Response: $response");
+
       return (response as List).map((json) {
+        // print("JSON: $json");
         final Map<String, dynamic> restructured = {
           ...json,
           'topic': json['topics'],
-          'users': {
-            'id': json['users']['id'],
-            'email': json['users']['email'],
-            'name': json['users']['name'],
-            'role': json['users']['role']
-          },
+          'user': json['users'],
         };
+        print(restructured);
 
         return SubmissionModel.fromJson(restructured);
       }).toList();
@@ -156,16 +159,22 @@ class SubmissionService {
       print("Submission created successfully!");
 
       // Restructure data to match your model
+      // final restructured = {
+      //   ...data,
+      //   'topic': data['topics'],
+      //   'user': {
+      //     'id': data['users']['id'],
+      //     'email': data['users']['email'],
+      //     'name': data['users']['name'],
+      //     'role': data['users']['role'],
+      //   },
+      // };
       final restructured = {
         ...data,
         'topic': data['topics'],
-        'user': {
-          'id': data['users']['id'],
-          'email': data['users']['email'],
-          'name': data['users']['name'],
-          'role': data['users']['role'],
-        },
+        'user': data['users'],
       };
+      print(restructured);
 
       return SubmissionModel.fromJson(restructured);
     } catch (e) {
