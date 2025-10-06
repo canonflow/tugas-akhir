@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
+import 'package:frontend/features/dosen/pages/topics/submissions/grade_page.dart';
 import 'package:frontend/features/mahasiswa/models/submission.dart';
 import 'package:frontend/features/mahasiswa/services/submission_service.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
@@ -146,6 +147,29 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
       setState(() {
         isDownloading = false;
       });
+    }
+  }
+
+  Future<void> openGradeDialog(String type, SubmissionModel submission) async {
+    try {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: type == "update" ? Text("Update the grade") : Text("Create the grade"),
+            content: Column(
+              children: [
+                Text("SD")
+              ],
+            ),
+          );
+        }
+      );
+    } catch (e) {
+      print(e);
+      if (mounted) {
+        CustomSimpleDialog(context, "Error", e.toString());
+      }
     }
   }
 
@@ -352,7 +376,31 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                                   if (submission.finalScore != null)
                                     Text('Final: ${submission.finalScore?.toStringAsFixed(1)}').small().semiBold(),
 
-
+                                  PrimaryButton(
+                                    size: ButtonSize.small,
+                                    onPressed: () {
+                                      if (submission.finalScore != null) {
+                                        Navigator.pushNamed(
+                                          context,
+                                          LectureSubmissionGradePage.route,
+                                          arguments: {
+                                            "submission": submission,
+                                            "type": "update"
+                                          }
+                                        );
+                                      } else {
+                                        Navigator.pushNamed(
+                                            context,
+                                            LectureSubmissionGradePage.route,
+                                            arguments: {
+                                              "submission": submission,
+                                              "type": "create"
+                                            }
+                                        );
+                                      }
+                                    },
+                                    child: submission.finalScore != null ? Text("Grade the submission") : Text("Update the Grade"),
+                                  ).withMargin(vertical: 4)
                                 ],
                               ),
                               trailing: Container(

@@ -158,17 +158,6 @@ class SubmissionService {
 
       print("Submission created successfully!");
 
-      // Restructure data to match your model
-      // final restructured = {
-      //   ...data,
-      //   'topic': data['topics'],
-      //   'user': {
-      //     'id': data['users']['id'],
-      //     'email': data['users']['email'],
-      //     'name': data['users']['name'],
-      //     'role': data['users']['role'],
-      //   },
-      // };
       final restructured = {
         ...data,
         'topic': data['topics'],
@@ -179,6 +168,23 @@ class SubmissionService {
       return SubmissionModel.fromJson(restructured);
     } catch (e) {
       print("Error create submission: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> gradeSubmission(SubmissionModel submission, double finalScore, String feedback) async {
+    try {
+      // TODO: 01. Prepare the query
+      print(submission.id);
+      await _supabase.from("submissions")
+        .update({
+          'final_score': finalScore,
+          'feedback': feedback,
+          'status': 'graded',
+        })
+        .eq('id', submission.id);
+    } catch (e) {
+      print("Error grade submission: $e");
       rethrow;
     }
   }

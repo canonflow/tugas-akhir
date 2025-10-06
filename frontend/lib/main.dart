@@ -4,7 +4,7 @@ import 'package:frontend/features/auth/pages/register_page.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/topics/create_page.dart';
 import 'package:frontend/features/dosen/pages/topics/detail_page.dart';
-import 'package:frontend/features/dosen/pages/topics/submissions/detail_page.dart';
+import 'package:frontend/features/dosen/pages/topics/submissions/grade_page.dart';
 import 'package:frontend/features/mahasiswa/models/submission.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/browse_page.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/detail_page.dart';
@@ -73,9 +73,11 @@ class MyApp extends StatelessWidget {
           case DetailTopicPage.route:
             final topic = settings.arguments as TopicModel;
             return MaterialPageRoute(builder: (context) => DetailTopicPage(topic: topic));
-          case LectureSubmissionDetailPage.route:
-            final submission = settings.arguments as SubmissionModel;
-            return MaterialPageRoute(builder: (context) => LectureSubmissionDetailPage(submission: submission));
+          case LectureSubmissionGradePage.route:
+            final args = settings.arguments as Map<String, dynamic>;
+            final submission = args['submission'] as SubmissionModel;
+            final type = args['type'] as String;
+            return MaterialPageRoute(builder: (context) => LectureSubmissionGradePage(submission: submission, type: type));
 
           // ===== MAHASISWA =====
           case BrowseTopicPage.route:
