@@ -4,8 +4,10 @@ import 'package:frontend/features/auth/pages/register_page.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/topics/create_page.dart';
 import 'package:frontend/features/dosen/pages/topics/detail_page.dart';
+import 'package:frontend/features/mahasiswa/models/submission.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/browse_page.dart';
 import 'package:frontend/features/mahasiswa/pages/topics/detail_page.dart';
+import 'package:frontend/features/mahasiswa/pages/topics/submissions/result_page.dart';
 import 'package:frontend/splash.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -63,6 +65,8 @@ class MyApp extends StatelessWidget {
             // Ambil role dari parameter
             final role = settings.arguments as Map<String, dynamic>;
             return MaterialPageRoute(builder: (context) => RegisterPage(role: role['role']!));
+
+          // ===== DOSEN =====
           case CreateTopicPage.route:
             return MaterialPageRoute(builder: (context) => CreateTopicPage());
           case DetailTopicPage.route:
@@ -76,6 +80,10 @@ class MyApp extends StatelessWidget {
           case StudentDetailTopicPage.route:
             final topic = settings.arguments as TopicModel;
             return MaterialPageRoute(builder: (context) => StudentDetailTopicPage(topic: topic));
+
+          case StudentFinalSubmissionPage.route:
+            final submission = settings.arguments as SubmissionModel;
+            return MaterialPageRoute(builder: (context) => StudentFinalSubmissionPage(submission: submission));
         }
       },
     );

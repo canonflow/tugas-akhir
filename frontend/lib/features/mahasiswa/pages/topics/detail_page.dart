@@ -13,7 +13,7 @@ class StudentDetailTopicPage extends StatefulWidget {
   final TopicModel topic;
   const StudentDetailTopicPage({super.key, required this.topic});
 
-  static const route = "/mahasiswa/topic/deetail";
+  static const route = "/mahasiswa/topic/detail";
 
   @override
   State<StudentDetailTopicPage> createState() => _StudentDetailTopicPageState();
