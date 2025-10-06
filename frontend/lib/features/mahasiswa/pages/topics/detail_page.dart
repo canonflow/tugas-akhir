@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
+import 'package:frontend/features/mahasiswa/models/submission.dart';
+import 'package:frontend/features/mahasiswa/services/submission_service.dart';
 import 'package:frontend/shared/app_bar.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,15 +22,34 @@ class StudentDetailTopicPage extends StatefulWidget {
 class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
   final ImagePicker _picker = ImagePicker();
   final _predictedScoreController = TextEditingController(text: '80');
+  final _submissionService = getIt<SubmissionService>();
   File? uploadedImage;
   bool isCalculating = false;
   bool isSubmitting = false;
+  bool isLoadingHistory = true;
 
   // TODO: Dummy History Data
-  List<Map<String, dynamic>> historyData = [
-    {'predictedScore': 85.0, 'finalScore': 82.0, 'status': 'graded'},
-    {'predictedScore': 78.0, 'finalScore': null, 'status': 'pending'},
-  ];
+  List<SubmissionModel> historyData = [];
+
+  // TODO: Load Submission History
+  Future<void> loadSubmissionHistory() async {
+    try {
+      final submissions = await _submissionService.getUserSubmissions(widget.topic.id);
+      print("Load Submission History");
+      setState(() {
+        historyData = submissions;
+      });
+    } catch (e) {
+      print("Error load submission history: $e");
+      if (mounted) {
+        CustomSimpleDialog(context, "Error", e.toString());
+      }
+    } finally {
+      setState(() {
+        isLoadingHistory = false;
+      });
+    }
+  }
 
   // TODO: Pick the image from galery
   Future<void> pickImage() async {
@@ -142,6 +164,12 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
       default:
         return Colors.gray;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadSubmissionHistory();
   }
 
   @override
@@ -293,7 +321,24 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
               ).h4.bold().muted(),
               const Gap(16),
 
-              if (historyData.isEmpty)
+              if (isLoadingHistory)
+                Column(
+                  children: List.generate(3, (index) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: Basic(
+                            title: const Text('Loading...').asSkeleton(),
+                            content: const Text('Please wait...').asSkeleton(),
+                            leading: const Avatar(initials: '').asSkeleton(),
+                            trailing: const Text('Status').asSkeleton(),
+                          ).withPadding(bottom: 20),
+                        )
+                      ]
+                    );
+                  }),
+                )
+              else if (historyData.isEmpty)
                 Center(
                   child: Column(
                     children: [
@@ -320,10 +365,10 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                                 children: [
                                   // Leading icon
                                   Icon(
-                                    item['finalScore'] != null
+                                    item.finalScore != null
                                         ? Icons.check_circle
                                         : Icons.pending,
-                                    color: getStatusColor(item['status']),
+                                    color: getStatusColor(item.status),
                                   ),
                                   const Gap(12),
 
@@ -343,11 +388,11 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                                                   vertical: 2
                                               ),
                                               decoration: BoxDecoration(
-                                                  color: getStatusColor(item['status']),
+                                                  color: getStatusColor(item.status),
                                                   borderRadius: BorderRadius.circular(4)
                                               ),
                                               child: Text(
-                                                getStatusText(item['status']),
+                                                getStatusText(item.status),
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 12
@@ -359,10 +404,10 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                                         const Gap(8),
 
                                         // Scores
-                                        Text('Score: ${item['predictedScore'].toStringAsFixed(1)}')
+                                        Text('Score: ${item.predictedScore.toStringAsFixed(1)}')
                                             .small(),
-                                        if (item['finalScore'] != null)
-                                          Text('Final Score: ${item['finalScore'].toStringAsFixed(1)}')
+                                        if (item.finalScore != null)
+                                          Text('Final Score: ${item.finalScore.toStringAsFixed(1)}')
                                               .small()
                                               .semiBold(),
                                       ],
