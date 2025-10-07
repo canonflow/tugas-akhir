@@ -499,10 +499,10 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                                           const Gap(8),
 
                                           // Scores
-                                          Text('Predicted Score: ${item.predictedScore.toStringAsFixed(1)}')
+                                          Text('Predicted Score: ${item.predictedScore.toString()}')
                                               .small(),
                                           if (item.finalScore != null)
-                                            Text('Final Score: ${item.finalScore!.toStringAsFixed(1)}')
+                                            Text('Final Score: ${item.finalScore!.toString()}')
                                                 .small()
                                                 .semiBold(),
                                         ],

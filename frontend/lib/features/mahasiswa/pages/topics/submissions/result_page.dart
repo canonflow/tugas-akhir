@@ -73,7 +73,7 @@ class _StudentFinalSubmissionPageState extends State<StudentFinalSubmissionPage>
               const Text('Predicted Score').semiBold(),
               const Gap(8),
               TextField(
-                initialValue: widget.submission.predictedScore.toStringAsFixed(0),
+                initialValue: widget.submission.predictedScore.toString(),
                 enabled: false,
                 style: const TextStyle(fontSize: 18),
               ),
@@ -85,7 +85,7 @@ class _StudentFinalSubmissionPageState extends State<StudentFinalSubmissionPage>
               const Gap(8),
               TextField(
                 initialValue: widget.submission.finalScore != null
-                    ? widget.submission.finalScore!.toStringAsFixed(0)
+                    ? widget.submission.finalScore!.toString()
                     : 'Not graded yet',
                 enabled: false,
                 style: TextStyle(
