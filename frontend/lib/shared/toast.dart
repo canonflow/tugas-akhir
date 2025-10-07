@@ -4,7 +4,7 @@ Widget buildToastSuccess(BuildContext context, ToastOverlay overlay) {
   return SurfaceCard(
       child: Basic(
         title: Text("Success"),
-        subtitle: Text("Image downloaded successfully"),
+        subtitle: Text("File downloaded successfully"),
         trailing: PrimaryButton(
             size: ButtonSize.small,
             onPressed: () {
@@ -21,7 +21,7 @@ Widget buildToastError(BuildContext context, ToastOverlay overlay) {
   return SurfaceCard(
       child: Basic(
         title: Text("Error"),
-        subtitle: Text("An error occurred while downloading the image!"),
+        subtitle: Text("An error occurred while downloading the file!"),
         trailing: PrimaryButton(
             size: ButtonSize.small,
             onPressed: () {

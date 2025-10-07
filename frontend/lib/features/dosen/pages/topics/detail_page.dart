@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:excel/excel.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:frontend/core/utils/image_downloader.dart';
 import 'package:frontend/core/utils/injections.dart';
@@ -31,6 +32,7 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
   List<SubmissionModel> submissions = [];
   bool isLoading = true;
   bool isDownloading = false;
+  bool isDownloadingExcel = false;
 
   Future<void> loadSubmissions() async {
     try {
@@ -110,6 +112,109 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
     }
   }
 
+  Future<void> exportSubmissionsToExcel(BuildContext context) async {
+    if (submissions.isEmpty) {
+      CustomSimpleDialog(context, "No Data", "No submissions to export");
+      return;
+    }
+
+    if (isDownloadingExcel) return;
+
+    setState(() {
+      isDownloadingExcel = true;
+    });
+
+    try {
+      // TODO: 01. Create Excel Workbook
+      var excel = Excel.createExcel();
+
+      // Delete default Sheet1
+      excel.delete('Sheet1');
+      Sheet sheetObject = excel["Submissions"];
+
+      // TODO: 02. Set Headers
+      sheetObject.appendRow([
+        TextCellValue("Student Name"),
+        TextCellValue("Email"),
+        TextCellValue("Predicted Score"),
+        TextCellValue("Final Score"),
+        TextCellValue("Status"),
+        TextCellValue("Feedback"),
+      ]);
+
+      // TODO: 03. Group submissions by user_id and get max final score
+      Map<String, SubmissionModel> userBestSubmissions = {};
+      for (var submission in submissions) {
+        String userId = submission.user.id!;
+
+        if (!userBestSubmissions.containsKey(userId)) {
+          userBestSubmissions[userId] = submission;
+        } else {
+          // TODO: 03-01. Compare final scores and keep the highest
+          var existingSubmission = userBestSubmissions[userId];
+          var existingScore = existingSubmission?.finalScore ?? 0.0;
+          var currectScore = submission.finalScore ?? 0.0;
+
+          if (currectScore > existingScore) {
+            userBestSubmissions[userId] = submission;
+          }
+        }
+      }
+
+      // TODO: 04. Add data rows
+      for (var submission in userBestSubmissions.values) {
+        sheetObject.appendRow([
+          TextCellValue(submission.user.name ?? "Unknown"),
+          TextCellValue(submission.user.email ?? "-"),
+          DoubleCellValue(submission.predictedScore),
+          submission.finalScore != null
+            ? DoubleCellValue(submission.finalScore!)
+            : TextCellValue("-"),
+          TextCellValue(getStatusText(submission.status)),
+          TextCellValue(submission.feedback ?? "-")
+        ]);
+      }
+
+      // TODO: 05. Save to temporary file
+      var fileBytes = excel.save();
+      final directory = await getTemporaryDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filePath = "${directory.path}/${widget.topic.name}_submissions_$timestamp.xlsx";
+
+      File(filePath)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(fileBytes!);
+
+      // TODO: 06. Save file using file dialog
+      final params = SaveFileDialogParams(
+        sourceFilePath: filePath,
+        fileName: '${widget.topic.name}_submissions_$timestamp.xlsx',
+      );
+      final finalPath = await FlutterFileDialog.saveFile(params: params);
+
+      if (finalPath != null && mounted) {
+        showToast(
+          context: context,
+          builder: buildToastSuccess,
+          location: ToastLocation.topCenter,
+        );
+      }
+
+    } catch (e) {
+      print("Error exporting to Excel: $e");
+      if (mounted) {
+        showToast(
+          context: context,
+          builder: buildToastError
+        );
+      }
+    } finally {
+      setState(() {
+        isDownloadingExcel = false;
+      });
+    }
+  }
+
   @override void initState() {
     // TODO: implement initState
     super.initState();
@@ -155,10 +260,11 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
 
                 const Gap(26),
 
+                // ===== BUTTON DOWLOAD =====
                 Row(
                   children: [
                     Expanded(
-                      child: SecondaryButton(
+                      child: OutlineButton(
                           onPressed: () async {
                             showEnrolledStudents(widget.topic);
                           },
@@ -166,6 +272,18 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                       ),
                     )
                   ],
+                ).withMargin(bottom: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Spacer(),
+                    PrimaryButton(
+                      onPressed: isDownloadingExcel ? null : () async {
+                        await exportSubmissionsToExcel(context);
+                      },
+                      child: Text("Download")
+                    ),
+                  ]
                 ),
 
                 const Gap(20),
