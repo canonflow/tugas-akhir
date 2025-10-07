@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:frontend/core/utils/image_downloader.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/mahasiswa/models/submission.dart';
@@ -7,6 +8,7 @@ import 'package:frontend/features/mahasiswa/pages/topics/submissions/result_page
 import 'package:frontend/features/mahasiswa/services/submission_service.dart';
 import 'package:frontend/shared/app_bar.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
+import 'package:frontend/shared/toast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
@@ -29,6 +31,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
   bool isCalculating = false;
   bool isSubmitting = false;
   bool isLoadingHistory = true;
+  bool isDownloading = false;
 
   // TODO: Dummy History Data
   List<SubmissionModel> historyData = [];
@@ -76,6 +79,39 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
     setState(() {
       uploadedImage = null;
     });
+  }
+
+  Future<void> downloadImage(BuildContext context, TopicModel topic) async {
+    if (isDownloading) return;
+
+    setState(() {
+      isDownloading = true;
+    });
+
+    try {
+      final finalPath = await imageDownloader(context, topic.image);
+
+      if (finalPath != null) {
+        showToast(
+            context: context,
+            builder: buildToastSuccess,
+            location: ToastLocation.topCenter
+        );
+      }
+    } catch (e) {
+      print(e.toString());
+      if (mounted) {
+        showToast(
+            context: context,
+            builder: buildToastError,
+            location: ToastLocation.topCenter
+        );
+      }
+    } finally {
+      setState(() {
+        isDownloading = false;
+      });
+    }
   }
 
   // TODO: Calculate the Similarity
@@ -236,6 +272,23 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                       );
                     },
                   ),
+                ).withMargin(bottom: 16),
+
+                // ====== DOWNLOAD ======
+                Row(
+                  children: [
+                    Expanded(
+                      child: PrimaryButton(
+                        leading: isDownloading ? const CircularProgressIndicator() : null,
+                        onPressed: isDownloading
+                            ? null
+                            : () async {
+                          await downloadImage(context, widget.topic);
+                        },
+                        child: const Text("Download Reference"),
+                      ),
+                    )
+                  ],
                 ),
 
                 // ===== UPLOADED IMAGE SECTION =====

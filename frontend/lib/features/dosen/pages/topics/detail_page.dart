@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:frontend/core/utils/image_downloader.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/topics/enrolled_student.dart';
@@ -8,6 +9,7 @@ import 'package:frontend/features/dosen/pages/topics/submissions/grade_page.dart
 import 'package:frontend/features/mahasiswa/models/submission.dart';
 import 'package:frontend/features/mahasiswa/services/submission_service.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
+import 'package:frontend/shared/toast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:frontend/shared/app_bar.dart';
@@ -75,40 +77,6 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
     return status[0].toUpperCase() + status.substring(1);
   }
 
-  Widget buildToastSuccess(BuildContext context, ToastOverlay overlay) {
-    return SurfaceCard(
-      child: Basic(
-        title: Text("Success"),
-        subtitle: Text("Image downloaded successfully"),
-        trailing: PrimaryButton(
-          size: ButtonSize.small,
-          onPressed: () {
-            overlay.close();
-          },
-          child: Text("Close")
-        ),
-        trailingAlignment: Alignment.center,
-      )
-    );
-  }
-
-  Widget buildToastError(BuildContext context, ToastOverlay overlay) {
-    return SurfaceCard(
-        child: Basic(
-          title: Text("Error"),
-          subtitle: Text("An error occurred while downloading the image!"),
-          trailing: PrimaryButton(
-              size: ButtonSize.small,
-              onPressed: () {
-                overlay.close();
-              },
-              child: Text("Close")
-          ),
-          trailingAlignment: Alignment.center,
-        )
-    );
-  }
-
   Future<void> downloadImage(BuildContext context, SubmissionModel submission) async {
     if (isDownloading) return;
 
@@ -117,23 +85,7 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
     });
 
     try {
-      // TODO: 01. Download the image
-      final response = await http.get(Uri.parse(submission.image!));
-
-      // TODO: 02. Get Temporary Directory
-      final dir = await getTemporaryDirectory();
-
-      // TODO: 03. Create an image name
-      var extension = submission.image!.split('.').last;
-      var filename = '${dir.path}/image_sketch.$extension';
-
-      // TODO: 04. Save to filesystem
-      final file = File(filename);
-      await file.writeAsBytes(response.bodyBytes);
-
-      // TODO: 05. Ask the user to save it
-      final params = SaveFileDialogParams(sourceFilePath: file.path);
-      final finalPath = await FlutterFileDialog.saveFile(params: params);
+      final finalPath = await imageDownloader(context, submission.image!);
 
       if (finalPath != null) {
         showToast(
