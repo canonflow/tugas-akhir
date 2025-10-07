@@ -128,8 +128,6 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
       // TODO: 01. Create Excel Workbook
       var excel = Excel.createExcel();
 
-      // Delete default Sheet1
-      excel.delete('Sheet1');
       Sheet sheetObject = excel["Submissions"];
 
       // TODO: 02. Set Headers
@@ -175,7 +173,10 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
         ]);
       }
 
-      // TODO: 05. Save to temporary file
+      // TODO: 05. Delete default Sheet1
+      excel.delete('Sheet1');
+
+      // TODO: 06. Save to temporary file
       var fileBytes = excel.save();
       final directory = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -185,7 +186,7 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
         ..createSync(recursive: true)
         ..writeAsBytesSync(fileBytes!);
 
-      // TODO: 06. Save file using file dialog
+      // TODO: 07. Save file using file dialog
       final params = SaveFileDialogParams(
         sourceFilePath: filePath,
         fileName: '${widget.topic.name}_submissions_$timestamp.xlsx',
