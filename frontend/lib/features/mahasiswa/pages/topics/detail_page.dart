@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:frontend/core/utils/image_downloader.dart';
 import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
@@ -10,7 +12,11 @@ import 'package:frontend/shared/app_bar.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
 import 'package:frontend/shared/toast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as path;
+import 'package:http_parser/http_parser.dart';
 
 class StudentDetailTopicPage extends StatefulWidget {
   final TopicModel topic;
@@ -114,6 +120,13 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
     }
   }
 
+  String getMimeType(String path) {
+    if (path.endsWith('.png')) return 'image/png';
+    if (path.endsWith(".jpeg")) return 'image/jpeg';
+    if (path.endsWith('.jpg')) return 'image/jpg';
+    return 'application/octet-stream';
+  }
+
   // TODO: Calculate the Similarity
   Future<void> calculateSimilarity() async {
     if (isCalculating) {
@@ -128,11 +141,67 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
     try {
       await Future.delayed(const Duration(seconds: 2));
 
-      setState(() {
-        _predictedScoreController.text = '${75 + (DateTime.now().millisecond % 20)}';
-      });
+      // TODO: 01. Check the Uploaded Image
+      if (uploadedImage == null) {
+        throw Exception("Please upload an image first");
+      }
+
+      final File localImage = uploadedImage!;
+
+      // TODO: 02. Download the Reference Image
+      final String referenceImageUrl = widget.topic.image!;
+      final imageResponse = await http.get(Uri.parse(referenceImageUrl));
+      if (imageResponse.statusCode != 200) {
+        throw Exception("Failed to download reference image");
+      }
+
+      // TODO: 03. Save it into Temporary Directory
+      final tempDir = await getTemporaryDirectory();
+      final tempPath = path.join(tempDir.path, 'reference_image${path.extension(referenceImageUrl)}');
+      final referenceImageFile = await File(tempPath)..writeAsBytesSync(imageResponse.bodyBytes);
+
+      // TODO: 04. Prepare Multipart Request
+      final apiUrl = dotenv.env['API_URL'];
+      if (apiUrl == null) {
+        throw Exception("API URL not found");
+      }
+
+      final uri = Uri.parse(apiUrl + "/calculate-similarity");
+      final request = http.MultipartRequest('POST', uri);
+
+      // TODO: 05. Add Reference and Uploaded Image
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'reference_image',
+          referenceImageFile.path,
+          contentType: MediaType.parse(getMimeType(referenceImageFile.path))
+        )
+      );
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'sketch_image',
+          localImage.path,
+          contentType: MediaType.parse(getMimeType(localImage.path))
+        )
+      );
+
+      // TODO: 06. Send Request
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode != 200) {
+        throw Exception("API ERROR: ${response.statusCode} - ${response.body}");
+      } else {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final double similarity = (data['similarity'] as num?)?.toDouble() ?? 0.0;
+        setState(() {
+          _predictedScoreController.text = similarity.toString();
+        });
+      }
+
 
     } catch (e) {
+      print(e);
       CustomSimpleDialog(context, "Error", e.toString());
     } finally {
       setState(() {

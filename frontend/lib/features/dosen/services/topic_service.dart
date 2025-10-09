@@ -11,6 +11,7 @@ class TopicService {
   final SupabaseClient _supabase = Supabase.instance.client;
   final authService = getIt<AuthService>();
 
+  // DOSEN
   Future<List<TopicModel>> getAll() async {
     final userId = authService.getCurrentUser().id!;
 
@@ -24,6 +25,7 @@ class TopicService {
       .toList();
   }
 
+  // DOSEN
   Future<TopicModel> create(String name, File image) async {
     try {
       final userId = authService.getCurrentUser().id;
@@ -66,6 +68,7 @@ class TopicService {
     }
   }
 
+  // MAHASISWA
   // TODO: Get All topics user (student) has not joined
   Future<List<TopicModel>> getAvailableTopic(String userId) async {
     try {
@@ -96,6 +99,7 @@ class TopicService {
     }
   }
 
+  // MAHASISWA
   // TODO: Get All topics user has joined
   Future<List<TopicModel>> getJoinedTopic(String userId) async {
     try {
@@ -119,6 +123,7 @@ class TopicService {
     }
   }
 
+  // MAHASISWA
   // TODO: Join the topic
   Future<TopicUserModel> joinTopic(TopicModel topic) async {
     try {
@@ -140,6 +145,7 @@ class TopicService {
     }
   }
 
+  // DOSEN
   // TODO: Get all users by topic
   Future<List<UserModel>> getTopicUsers(TopicModel topic) async {
     try {

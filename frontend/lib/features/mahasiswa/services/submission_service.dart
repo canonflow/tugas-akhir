@@ -10,6 +10,7 @@ class SubmissionService {
   final SupabaseClient _supabase = Supabase.instance.client;
   final AuthService _authService = getIt<AuthService>();
 
+  // DOSEN
   Future<List<SubmissionModel>> getSubmissionByTopic(TopicModel topic) async {
     try {
       final response = await _supabase
@@ -57,6 +58,7 @@ class SubmissionService {
     }
   }
 
+  // MAHASISWA
   Future<List<SubmissionModel>> getUserSubmissions(int topicId) async {
     try {
       final userId = _authService.getCurrentUser().id!;
@@ -101,11 +103,12 @@ class SubmissionService {
         return SubmissionModel.fromJson(restructured);
       }).toList();
     } catch (e) {
-      print("Error getching user submissions: $e");
+      print("Error fetching user submissions: $e");
       rethrow;
     }
   }
 
+  // MAHASISWA
   Future<SubmissionModel> createSubmission(File image, int topicId, double predictedScore) async {
     try {
       final userId = _authService.getCurrentUser().id!;
@@ -172,6 +175,7 @@ class SubmissionService {
     }
   }
 
+  // DOSEN
   Future<void> gradeSubmission(SubmissionModel submission, double finalScore, String feedback) async {
     try {
       // TODO: 01. Prepare the query
