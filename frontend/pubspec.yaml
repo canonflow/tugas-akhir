@@ -38,6 +38,7 @@ dependencies:
   supabase_flutter: ^2.10.0
   shadcn_flutter: ^0.0.42
   image_picker: ^1.2.0
+  image_cropper: ^8.0.2
   flutter_dotenv: ^6.0.0
   lottie: ^3.3.0
   page_transition: ^2.2.1

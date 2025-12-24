@@ -12,11 +12,20 @@ import 'package:frontend/shared/app_bar.dart';
 import 'package:frontend/shared/custom_simple_dialog.dart';
 import 'package:frontend/shared/toast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:http_parser/http_parser.dart';
+
+class CropAspectRatioPresetCustom implements CropAspectRatioPresetData {
+  @override
+  (int, int)? get data => (2, 3);
+
+  @override
+  String get name => '2x3 (customized)';
+}
 
 class StudentDetailTopicPage extends StatefulWidget {
   final TopicModel topic;
@@ -30,7 +39,7 @@ class StudentDetailTopicPage extends StatefulWidget {
 
 class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
   final ImagePicker _picker = ImagePicker();
-  final _predictedScoreController = TextEditingController(text: '80');
+  final _predictedScoreController = TextEditingController(text: '');
   final GlobalKey<RefreshTriggerState> _refreshTriggerKey = GlobalKey<RefreshTriggerState>();
   final _submissionService = getIt<SubmissionService>();
   File? uploadedImage;
@@ -59,6 +68,136 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
       setState(() {
         isLoadingHistory = false;
       });
+    }
+  }
+
+  // TODO: Show image source selection dialog
+  Future<void> showImageSourceDialog() async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Image Source'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: OutlineButton(
+                    leading: const Icon(Icons.camera_alt),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      captureImage();
+                    },
+                    child: const Text('Camera'),
+                  ),
+                ),
+              ],
+            ),
+            const Gap(12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlineButton(
+                    leading: const Icon(Icons.photo_library),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      pickImageFromGallery();
+                    },
+                    child: const Text('Gallery'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // TODO: Capture image from camera
+  Future<void> captureImage() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 100,
+      );
+
+      if (pickedFile != null) {
+        // Crop the captured image
+        await cropImage(pickedFile.path);
+      }
+    } catch (e) {
+      if (mounted) {
+        CustomSimpleDialog(context, "Error", e.toString());
+      }
+    }
+  }
+
+  // TODO: Pick image from gallery
+  Future<void> pickImageFromGallery() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 100,
+      );
+
+      if (pickedFile != null) {
+        setState(() {
+          uploadedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        CustomSimpleDialog(context, "Error", e.toString());
+      }
+    }
+  }
+
+  // TODO: Crop image
+  Future<void> cropImage(String imagePath) async {
+    try {
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: imagePath,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Image',
+            toolbarColor: Colors.blue,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false,
+            aspectRatioPresets: [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9,
+              CropAspectRatioPresetCustom(),
+            ]
+          ),
+          IOSUiSettings(
+            title: 'Crop Image',
+            aspectRatioLockEnabled: false,
+            resetAspectRatioEnabled: true,
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        setState(() {
+          uploadedImage = File(croppedFile.path);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        CustomSimpleDialog(context, "Error", "Failed to crop image: $e");
+      }
     }
   }
 
@@ -166,7 +305,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
         throw Exception("API URL not found");
       }
 
-      final uri = Uri.parse(apiUrl + "/calculate-similarity");
+      final uri = Uri.parse(apiUrl + "/api/calculate-similarity");
       final request = http.MultipartRequest('POST', uri);
 
       // TODO: 05. Add Reference and Uploaded Image
@@ -407,7 +546,8 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                     Expanded(
                       child: OutlineButton(
                         leading: const Icon(Icons.image),
-                        onPressed: pickImage,
+                        // onPressed: pickImage,
+                        onPressed: showImageSourceDialog,
                         child: const Text('Select an image'),
                       ),
                     ),

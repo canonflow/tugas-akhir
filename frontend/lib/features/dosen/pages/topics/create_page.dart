@@ -27,8 +27,12 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   String? selectedImageKey;
 
   final Map<String, String> availableImages = {
-    "Test": "public/images/test.jpg",
-    "Test 2": "public/images/test2.jpg"
+    // "Test": "public/images/test.jpg",
+    // "Test 2": "public/images/test2.jpg",
+    "Botol": "public/images/botol.png",
+    "Buah 1": "public/images/buah-1.png",
+    "Buah 2": "public/images/buah-2.png",
+    "Rubik": "public/images/rubik.png"
   };
 
   // TODO: Pick the image
