@@ -2,6 +2,8 @@ import 'package:frontend/core/utils/injections.dart';
 import 'package:frontend/features/auth/pages/login_page.dart';
 import 'package:frontend/features/auth/pages/register_page.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
+import 'package:frontend/features/dosen/pages/references/anchor_page.dart';
+import 'package:frontend/features/dosen/pages/references/create_page.dart';
 import 'package:frontend/features/dosen/pages/topics/create_page.dart';
 import 'package:frontend/features/dosen/pages/topics/detail_page.dart';
 import 'package:frontend/features/dosen/pages/topics/submissions/grade_page.dart';
@@ -78,6 +80,11 @@ class MyApp extends StatelessWidget {
             final submission = args['submission'] as SubmissionModel;
             final type = args['type'] as String;
             return MaterialPageRoute(builder: (context) => LectureSubmissionGradePage(submission: submission, type: type));
+
+          case AnchorsPage.route:
+            return MaterialPageRoute(builder: (context) => AnchorsPage());
+          case CreateAnchorPage.route:
+            return MaterialPageRoute(builder: (context) => CreateAnchorPage());
 
           // ===== MAHASISWA =====
           case BrowseTopicPage.route:
