@@ -192,6 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 // GO TO REGISTER
+                SizedBox(height: 18),
                 GestureDetector(
                   onTap: () => openModalRegister(),
                   child: Center(
@@ -202,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ).xSmall.bold,
                   ),
-                ).withMargin(top: 18)
+                )
               ],
             ),
           )

@@ -181,7 +181,9 @@ class _AnchorsPageState extends State<AnchorsPage> {
                       child: const Icon(Icons.refresh_rounded),
                     ),
                   ],
-                ).withMargin(bottom: 16),
+                ),
+
+                SizedBox(height: 16),
                 
                 Row(
                   children: [
@@ -194,7 +196,9 @@ class _AnchorsPageState extends State<AnchorsPage> {
                       )
                     )
                   ],
-                ).withMargin(bottom: 12),
+                ),
+
+                SizedBox(height: 12),
 
                 // Loading state
                 if (isLoading)

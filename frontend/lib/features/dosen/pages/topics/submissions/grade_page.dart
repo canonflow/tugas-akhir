@@ -108,7 +108,8 @@ class _LectureSubmissionGradePageState extends State<LectureSubmissionGradePage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Sketch Image").withMargin(bottom: 10).h3,
+              Text("Sketch Image").h3,
+              SizedBox(height: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
@@ -126,34 +127,44 @@ class _LectureSubmissionGradePageState extends State<LectureSubmissionGradePage>
                     );
                   },
                 ),
-              ).withMargin(bottom: 14),
+              ),
+              SizedBox(height: 14),
 
               // ===== Information =====
-              Text("Predicted Score").withMargin(bottom: 10).medium,
+              Text("Predicted Score").medium,
+              SizedBox(height: 10),
               TextField(
                 controller: TextEditingController(text: widget.submission.predictedScore.toString()),
                 enabled: false,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ).withMargin(bottom: 16),
+              ),
+
+              SizedBox(height: 16),
 
 
               // ===== FINAL SCORE ======
-              Text("Final Score").withMargin(bottom: 10).medium,
+              Text("Final Score").medium,
+              SizedBox(height: 10),
               TextField(
                 controller: _finalScoreController,
                 enabled: true,
                 placeholder: Text("Input the final score"),
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ).withMargin(bottom: 16),
+              ),
+
+              SizedBox(height: 16),
 
               // ====== FEEDBACK ======
-              Text("Feedback").withMargin(bottom: 10).medium,
+              Text("Feedback").medium,
+              SizedBox(height: 10),
               TextArea(
                 controller: _feedbackController,
                 expandableHeight: true,
                 initialHeight: 160,
                 placeholder: Text("Input the feedback (optional)"),
-              ).withMargin(bottom: 22),
+              ),
+
+              SizedBox(height: 22),
 
               // ===== BUTTON =====
               Row(

@@ -57,13 +57,14 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           content(),
           const Gap(22),
+          SizedBox(height: 20),
           Text(
             "Getting Started . . .",
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.slate[800]
             ),
-          ).h3.withMargin(horizontal: 20),
+          ).h3,
         ],
       )
     );

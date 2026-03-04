@@ -273,7 +273,8 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                       ),
                     )
                   ],
-                ).withMargin(bottom: 10),
+                ),
+                SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -313,7 +314,8 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                       child: const Icon(Icons.refresh_rounded),
                     ),
                   ],
-                ).withMargin(bottom: 15),
+                ),
+                SizedBox(height: 15),
                 if (isLoading)
                   Column(
                     children: List.generate(3, (index) {
@@ -471,7 +473,8 @@ class _DetailTopicPageState extends State<DetailTopicPage> {
                                       }
                                     },
                                     child: submission.finalScore == null ? Text("Grade the submission") : Text("Update the Grade"),
-                                  ).withMargin(vertical: 4)
+                                  ),
+                                  SizedBox(height: 4),
                                 ],
                               ),
                               trailing: Container(

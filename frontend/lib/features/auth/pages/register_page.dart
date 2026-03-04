@@ -145,6 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ],
                 ),
 
+                SizedBox(height: 18),
                 // GO TO LOGIN
                 GestureDetector(
                   onTap: () => {
@@ -158,7 +159,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ).xSmall.bold,
                   ),
-                ).withMargin(top: 18)
+                )
               ],
             ),
           )

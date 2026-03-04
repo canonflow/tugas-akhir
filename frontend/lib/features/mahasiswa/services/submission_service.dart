@@ -10,6 +10,21 @@ class SubmissionService {
   final SupabaseClient _supabase = Supabase.instance.client;
   final AuthService _authService = getIt<AuthService>();
 
+  Future<String> getEndpoint() async {
+    try {
+      final response = await _supabase
+          .from("server")
+          .select("endpoint")
+          .order('created_at', ascending: false)
+          .single();
+
+      return response['endpoint'] as String;
+    } catch (e) {
+      print("Error Fetching Endpoint: $e");
+      rethrow;
+    }
+  }
+
   // DOSEN
   Future<List<SubmissionModel>> getSubmissionByTopic(TopicModel topic) async {
     try {

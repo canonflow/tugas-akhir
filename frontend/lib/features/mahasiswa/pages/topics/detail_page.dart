@@ -47,6 +47,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
   bool isSubmitting = false;
   bool isLoadingHistory = true;
   bool isDownloading = false;
+  String urlServer= "";
 
   // TODO: Dummy History Data
   List<SubmissionModel> historyData = [];
@@ -69,6 +70,10 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
         isLoadingHistory = false;
       });
     }
+  }
+
+  Future<void> loadUrlServer() async {
+    urlServer = await _submissionService.getEndpoint();
   }
 
   // TODO: Show image source selection dialog
@@ -151,6 +156,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
       if (pickedFile != null) {
         setState(() {
           uploadedImage = File(pickedFile.path);
+          _predictedScoreController.text = "";
         });
       }
     } catch (e) {
@@ -192,6 +198,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
       if (croppedFile != null) {
         setState(() {
           uploadedImage = File(croppedFile.path);
+          _predictedScoreController.text = "";
         });
       }
     } catch (e) {
@@ -223,6 +230,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
   void removeImage() {
     setState(() {
       uploadedImage = null;
+      _predictedScoreController.text = "";
     });
   }
 
@@ -305,7 +313,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
         throw Exception("API URL not found");
       }
 
-      final uri = Uri.parse(apiUrl + "/api/calculate-similarity");
+      final uri = Uri.parse(urlServer + "/api/calculate-similarity");
       final request = http.MultipartRequest('POST', uri);
 
       // TODO: 05. Add Reference and Uploaded Image
@@ -382,6 +390,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
       setState(() {
         historyData.insert(0, submission);
         uploadedImage = null;
+        _predictedScoreController.text = "";
       });
 
       if (mounted) {
@@ -428,6 +437,7 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
   @override
   void initState() {
     super.initState();
+    loadUrlServer();
     loadSubmissionHistory();
   }
 
@@ -480,7 +490,9 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
                       );
                     },
                   ),
-                ).withMargin(bottom: 16),
+                ),
+
+                SizedBox(height: 8),
 
                 // ====== DOWNLOAD ======
                 Row(
