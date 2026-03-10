@@ -7,6 +7,7 @@ import 'package:frontend/features/auth/services/auth_service.dart';
 import 'package:frontend/features/dosen/models/topic.dart';
 import 'package:frontend/features/dosen/pages/references/create_page.dart';
 import 'package:frontend/features/mahasiswa/models/topic_user.dart';
+import 'package:frontend/features/mahasiswa/services/submission_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -16,6 +17,7 @@ import 'dart:convert';
 class AnchorService {
   final SupabaseClient _supabase = Supabase.instance.client;
   final authService = getIt<AuthService>();
+  final _submissionService = getIt<SubmissionService>();
 
   // DOSEN
   // TODO: Get all reference image from supabase (table 'anchors')
@@ -62,10 +64,7 @@ class AnchorService {
       ) async {
     try {
       // Get API URL from .env
-      final apiUrl = dotenv.env['API_URL'];
-      if (apiUrl == null) {
-        throw Exception('API_URL not found in environment variables');
-      }
+      final apiUrl = await _submissionService.getEndpoint();
 
       final uri = Uri.parse('$apiUrl/api/re-train');
       final request = http.MultipartRequest('POST', uri);
