@@ -308,10 +308,10 @@ class _StudentDetailTopicPageState extends State<StudentDetailTopicPage> {
       final referenceImageFile = await File(tempPath)..writeAsBytesSync(imageResponse.bodyBytes);
 
       // TODO: 04. Prepare Multipart Request
-      final apiUrl = dotenv.env['API_URL'];
-      if (apiUrl == null) {
-        throw Exception("API URL not found");
-      }
+      // final apiUrl = dotenv.env['API_URL'];
+      // if (apiUrl == null) {
+      //   throw Exception("API URL not found");
+      // }
 
       final uri = Uri.parse(urlServer + "/api/calculate-similarity");
       final request = http.MultipartRequest('POST', uri);
